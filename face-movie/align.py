@@ -42,16 +42,20 @@ def prompt_user_to_choose_face(im, rects):
 
     DISPLAY_HEIGHT = 650
     resized = cv2.resize(im, (int(w * DISPLAY_HEIGHT / float(h)), DISPLAY_HEIGHT))
-    cv2.imshow("Multiple faces", resized); cv2.waitKey(1)
-    target_index = int(input("Please choose the index of the target face: "))
-    cv2.destroyAllWindows(); cv2.waitKey(1)
+    cv2.imwrite("multiple.jpg", resized)
+    # cv2.imshow("Multiple faces", resized); cv2.waitKey(1)
+    target_index = int(input("Please choose the index of the target face (multiple.jpg): "))
+    os.remove("multiple.jpg")
+    # cv2.destroyAllWindows(); cv2.waitKey(1)
     return rects[target_index]
 
 def get_landmarks(im):
     rects = DETECTOR(im, 1)
     if len(rects) == 0 and len(DETECTOR(im, 0)) > 0:
         rects = DETECTOR(im, 0)
-    assert len(rects) > 0, "No faces found!"
+    if len(rects) == 0:
+        cv2.imwrite("missing.jpg", im)
+    assert len(rects) > 0, "No faces found (missing.jpg)!"
     target_rect = rects[0] 
     if len(rects) > 1:
         target_rect = prompt_user_to_choose_face(im, rects)
